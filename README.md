@@ -2,4 +2,3 @@
 
 This is a repository for CodeOn! session on 2019/03/06
 
-You can use the binder link above to get a working copy of the presentation materials
