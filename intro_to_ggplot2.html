@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Introduction to ggplot2</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Kevin Stachelek" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Introduction to ggplot2
+### Kevin Stachelek
+### 2019/03/06 (updated: 2019-02-22)
+
+---
+
+
+
+
+# Resources
+
+.pull-left[
+&lt;span style="font-size: 200%"&gt;[R for Data Science](https://r4ds.had.co.nz/)&lt;/span&gt;
+
+&lt;span style="font-size: 200%"&gt;[rstudio cheat sheets](https://www.rstudio.com/resources/cheatsheets/)&lt;/span&gt;
+]
+
+.pull-right[
+![](r4ds.png)
+]
+
+---
+
+# Data Science Workflow
+
+![](data-science_cycle.png)
+
+---
+
+# Load Packages
+
+
+```r
+library(dplyr)
+library(ggplot2)
+library(gapminder)
+```
+
+---
+
+# Load Data 
+
+
+```r
+gm_2007 &lt;- gapminder %&gt;%
+  filter(year == 2007)
+
+gm_2007
+```
+
+```
+## # A tibble: 142 x 6
+##    country     continent  year lifeExp       pop gdpPercap
+##    &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;
+##  1 Afghanistan Asia       2007    43.8  31889923      975.
+##  2 Albania     Europe     2007    76.4   3600523     5937.
+##  3 Algeria     Africa     2007    72.3  33333216     6223.
+##  4 Angola      Africa     2007    42.7  12420476     4797.
+##  5 Argentina   Americas   2007    75.3  40301927    12779.
+##  6 Australia   Oceania    2007    81.2  20434176    34435.
+##  7 Austria     Europe     2007    79.8   8199783    36126.
+##  8 Bahrain     Asia       2007    75.6    708573    29796.
+##  9 Bangladesh  Asia       2007    64.1 150448339     1391.
+## 10 Belgium     Europe     2007    79.4  10392226    33693.
+## # ... with 132 more rows
+```
+
+---
+
+#  Relationship between wealth and life expectancy
+
+
+```r
+ggplot(gm_2007, aes(x = gdpPercap, y = lifeExp)) +
+geom_point()
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+
+# Parts of a Plot
+
+
+```r
+ggplot(gm_2007, aes(x = gdpPercap, y = lifeExp)) +
+geom_point()
+```
+
+--
+
+* `aes` stand for 'aesthetic'--general term for settings that affect the display of a plot
+
+--
+
+* here we specify the x and y axes in the `aes` argument
+
+--
+
+* use `+` to add 'layers' to the graph
+
+--
+
+* `geom` stands for 'geometric object'
+
+--
+
+* `geom_point` means 'make a scatterplot'
+
+---
+
+#  Using a log scale
+
+
+```r
+ggplot(gm_2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() +
+  scale_x_log10()
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+---
+
+# Point Color Point Size
+
+
+```r
+ggplot(gm_2007, aes(gdpPercap, lifeExp, color = continent)) +
+  geom_point() +
+  scale_x_log10()
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+---
+
+# Point Size
+
+
+```r
+ggplot(gm_2007, 
+       aes(gdpPercap, lifeExp, color = continent, size = pop)) +
+  geom_point() +
+  scale_x_log10()
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+---
+
+# Aesthetics
+
+
+|Aesthetic |Variable  |
+|:---------|:---------|
+|x         |gdpPerCap |
+|y         |lifeExp   |
+|color     |continent |
+|size      |pop       |
+
+#### And many more!
+
+---
+
+# Facets
+
+
+```r
+facet_plot &lt;- ggplot(gm_2007, aes(x = gdpPercap, y = lifeExp)) +
+  geom_point() +
+  scale_x_log10() +
+  facet_wrap(~ continent)
+
+print(facet_plot)
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+---
+
+# How to Print to a File
+
+### Three ways:
+
+--
+
+### ggsave
+
+--
+
+### graphicsdevice
+
+--
+
+### manual
+
+---
+
+# ggsave
+
+#### ggsave defaults to the last printed plot
+
+
+```r
+ggsave("test_facet_plot2.pdf")
+```
+
+#### otherwise you can specify a plot object as the second argument
+
+
+```r
+ggsave("test_facet_plot2.pdf", plot = facet_plot)
+```
+
+---
+
+# graphicsdevice (pdf, png, jpg, etc.)
+
+#### *Warning* The plot needs to be *printed*, not just created within the graphics device
+
+
+```r
+pdf("test_facet_plot1.pdf")
+facet_plot
+dev.off()
+```
+
+```
+## png 
+##   2
+```
+
+---
+
+# Manually
+
+
+```r
+# can use the rstudio viewer pane
+print(facet_plot)
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+---
+
+# Putting it all together in a plot!
+
+
+```r
+by_year &lt;- gapminder %&gt;%
+  group_by(year) %&gt;%
+  summarize(totalPop = sum(pop, na.rm = T)) %&gt;%
+  identity()
+
+by_year
+```
+
+```
+## # A tibble: 12 x 2
+##     year   totalPop
+##    &lt;int&gt;      &lt;dbl&gt;
+##  1  1952 2406957150
+##  2  1957 2664404580
+##  3  1962 2899782974
+##  4  1967 3217478384
+##  5  1972 3576977158
+##  6  1977 3930045807
+##  7  1982 4289436840
+##  8  1987 4691477418
+##  9  1992 5110710260
+## 10  1997 5515204472
+## 11  2002 5886977579
+## 12  2007 6251013179
+```
+
+---
+
+
+```r
+ggplot(by_year, aes(x = year, y = totalPop)) +
+  geom_point()
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+
+---
+
+
+
+```r
+ggplot(by_year, aes(x = year, y = totalPop)) +
+  geom_point() +
+  expand_limits(y = 0)
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
+---
+
+```r
+by_year_continent &lt;- gapminder %&gt;%
+  group_by(year, continent) %&gt;%
+  summarize(totalPop = sum(pop),
+            meanLifeExp = mean(lifeExp))
+
+by_year_continent
+```
+
+```
+## # A tibble: 60 x 4
+## # Groups:   year [?]
+##     year continent   totalPop meanLifeExp
+##    &lt;int&gt; &lt;fct&gt;          &lt;int&gt;       &lt;dbl&gt;
+##  1  1952 Africa     237640501        39.1
+##  2  1952 Americas   345152446        53.3
+##  3  1952 Asia      1395357351        46.3
+##  4  1952 Europe     418120846        64.4
+##  5  1952 Oceania     10686006        69.3
+##  6  1957 Africa     264837738        41.3
+##  7  1957 Americas   386953916        56.0
+##  8  1957 Asia      1562780599        49.3
+##  9  1957 Europe     437890351        66.7
+## 10  1957 Oceania     11941976        70.3
+## # ... with 50 more rows
+```
+
+---
+
+
+```r
+ggplot(by_year_continent, aes(x = year, y = totalPop, color = continent)) +
+  geom_point() +
+  expand_limits(y = 0)
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+
+---
+
+# Other Types of Plots
+
+--
+
+# line plots
+
+change over time
+
+
+```r
+ggplot(by_year_continent, aes(x = year, y = totalPop, color = continent, height = 3)) +
+* geom_line() +
+  expand_limits(y = 0)
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+
+---
+
+# bar plots
+
+comparing over several categories
+
+
+
+
+```r
+ggplot(by_continent, aes(x = continent, y = meanLifeExp)) +
+* geom_col()
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+
+---
+
+# histograms
+
+distribution of a single numeric variable
+
+
+```r
+ggplot(gm_2007, aes(x = lifeExp)) +
+* geom_histogram()
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-21-1.png)&lt;!-- --&gt;
+
+---
+
+# It's important to manage the binwidth of a histogram
+
+
+```r
+ggplot(gm_2007, aes(x = lifeExp)) +
+* geom_histogram(binwidth = 5)
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+
+---
+
+# box plots
+
+distribution of several numeric variables
+
+
+```r
+ggplot(gm_2007, aes(x = continent, y = lifeExp)) +
+* geom_boxplot()
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+
+---
+
+# Histogram vs Box Plot
+
+.pull-left[
+
+```r
+ggplot(gm_2007, aes(x = lifeExp)) +
+* geom_histogram()
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
+
+```r
+ggplot(gm_2007, aes(x = continent, y = lifeExp)) +
+* geom_boxplot()
+```
+
+![](intro_to_ggplot2_files/figure-html/unnamed-chunk-25-1.png)&lt;!-- --&gt;
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
